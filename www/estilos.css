@@ -1,0 +1,253 @@
+/* styles.css - Estilos principales del widget BCV */
+
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #34495e;
+    --accent-color: #3498db;
+    --text-light: #ecf0f1;
+    --text-dark: #2c3e50;
+    --success-color: #27ae60;
+    --error-color: #e74c3c;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: silver;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.contenedor-principal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 380px;
+    width: 100%;
+}
+
+.widget-bcv {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    width: 100%;
+    overflow: hidden;
+    transition: var(--transition);
+    margin-bottom: 0;
+}
+
+.widget-bcv:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.widget-header {
+    background: var(--primary-color);
+    color: var(--text-light);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 3px solid var(--accent-color);
+}
+
+.widget-header h1 {
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+}
+
+.widget-header p {
+    font-size: 0.9em;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.widget-body {
+    padding: 0;
+}
+
+.moneda-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #ecf0f1;
+    transition: var(--transition);
+}
+
+.moneda-item:hover {
+    background-color: #f8f9fa;
+}
+
+.moneda-item:last-child {
+    border-bottom: none;
+}
+
+.moneda-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+}
+
+.moneda-simbolo {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--primary-color);
+    min-width: 40px;
+    text-align: center;
+}
+
+.moneda-nombre h3 {
+    font-size: 1em;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.moneda-valor {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.moneda-valor .valor {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1.2;
+}
+
+.widget-footer {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e9ecef;
+}
+
+.fecha-actualizacion {
+    font-size: 0.9em;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Botón de calculadora */
+.btn-calculadora {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+}
+
+.btn-calculadora:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+}
+
+.btn-icono {
+    font-size: 0.8em;
+    transition: transform 0.3s ease;
+}
+
+.btn-calculadora.activo .btn-icono {
+    transform: rotate(90deg);
+}
+
+.estado-carga {
+    opacity: 0.6;
+}
+
+.error-widget {
+    background: var(--error-color);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9em;
+    border-radius: 4px;
+    margin: 10px;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.loading-skeleton {
+    animation: pulse 1.5s infinite;
+}
+
+.skeleton-text {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+    color: transparent !important;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
+    .contenedor-principal {
+        max-width: 100%;
+    }
+    
+    .moneda-item {
+        padding: 15px;
+    }
+    
+    .moneda-simbolo {
+        font-size: 1.8em;
+        min-width: 35px;
+    }
+    
+    .moneda-valor .valor {
+        font-size: 1.3em;
+    }
+    
+    .widget-footer {
+        padding: 12px 15px;
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .btn-calculadora {
+        width: 100%;
+        justify-content: center;
+    }
+}

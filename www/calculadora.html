@@ -1,0 +1,47 @@
+<div class="widget-bcv" id="calculadoraBCV">
+    <div class="widget-header">
+        <h1>Calculadora de Divisas</h1>
+        <p>Conversor BCV</p>
+    </div>
+    
+    <div class="widget-body">
+        <div class="calculadora-form">
+            <div class="campo">
+                <label for="monto">Monto:</label>
+                <input type="number" id="monto" step="any" placeholder="0.00" required>
+            </div>
+            
+            <div class="campo">
+                <label for="monedaOrigen">De:</label>
+                <select id="monedaOrigen">
+                    <option value="USD">Dólar (USD)</option>
+                    <option value="EUR">Euro (EUR)</option>
+                    <option value="BS">Bolívar (BS)</option>
+                </select>
+            </div>
+            
+            <div class="campo">
+                <label for="monedaDestino">A:</label>
+                <select id="monedaDestino">
+                    <option value="BS">Bolívar (BS)</option>
+                    <option value="USD">Dólar (USD)</option>
+                    <option value="EUR">Euro (EUR)</option>
+                </select>
+            </div>
+            
+            <button type="button" id="btnCalcular" class="btn-calcular">
+                <span>Calcular</span>
+            </button>
+            
+            <div class="resultado" id="resultado">
+                <div class="resultado-texto">--</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="widget-footer">
+        <div class="fecha-actualizacion">
+            <span id="fechaCalculadora">--/--/----</span>
+        </div>
+    </div>
+</div>
