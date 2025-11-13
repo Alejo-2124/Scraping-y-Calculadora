@@ -66,17 +66,27 @@
                     <input type="text" id="pantalla" readonly value="0">
                 </div>
                 
-                <!-- Selector de moneda -->
-                <div class="selector-moneda">
-                    <select id="monedaOrigen">
-                        <option value="USD">USD → Bs</option>
-                        <option value="EUR">EUR → Bs</option>
-                        <option value="BS">Bs → USD</option>
-                        <option value="BS-EUR">Bs → EUR</option>
-                    </select>
+                <!-- Resultados de conversión automática -->
+                <div class="resultados-conversion" id="resultadosConversion">
+                    <div class="resultado-item">
+                        <span class="resultado-label">USD → Bs:</span>
+                        <span class="resultado-valor" id="resultadoUsd">0,00 Bs</span>
+                    </div>
+                    <div class="resultado-item">
+                        <span class="resultado-label">EUR → Bs:</span>
+                        <span class="resultado-valor" id="resultadoEur">0,00 Bs</span>
+                    </div>
+                    <div class="resultado-item">
+                        <span class="resultado-label">Bs → USD:</span>
+                        <span class="resultado-valor" id="resultadoBsUsd">0,00 USD</span>
+                    </div>
+                    <div class="resultado-item">
+                        <span class="resultado-label">Bs → EUR:</span>
+                        <span class="resultado-valor" id="resultadoBsEur">0,00 EUR</span>
+                    </div>
                 </div>
                 
-                <!-- Botones de la calculadora -->
+                <!-- Botones de la calculadora (SIN BOTÓN DE CONVERSIÓN) -->
                 <div class="botones-calculadora">
                     <button class="btn-calc btn-limpiar" data-action="limpiar">C</button>
                     <button class="btn-calc btn-operador" data-action="borrar">⌫</button>
@@ -96,11 +106,10 @@
                     <button class="btn-calc btn-numero" data-value="1">1</button>
                     <button class="btn-calc btn-numero" data-value="2">2</button>
                     <button class="btn-calc btn-numero" data-value="3">3</button>
-                    <button class="btn-calc btn-igual" data-action="calcular" rowspan="2">=</button>
+                    <button class="btn-calc btn-igual" data-action="calcular">=</button>
                     
                     <button class="btn-calc btn-numero btn-cero" data-value="0">0</button>
                     <button class="btn-calc btn-numero" data-value=".">.</button>
-                    <button class="btn-calc btn-convertir" data-action="convertir">Convertir</button>
                 </div>
             </div>
         </div>

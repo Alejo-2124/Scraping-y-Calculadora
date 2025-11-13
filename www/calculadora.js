@@ -1,16 +1,22 @@
 /**
  * calculadora.js
- * Lógica de la calculadora de divisas con control de visibilidad
- * @version 1.1
+ * Lógica de la calculadora de divisas con conversión automática
+ * @version 1.2
  */
 
 class CalculadoraDivisas {
     constructor() {
         this.pantalla = document.getElementById('pantalla');
-        this.monedaOrigen = document.getElementById('monedaOrigen');
         this.calculadora = document.getElementById('calculadora');
         this.btnCalculadora = document.getElementById('btnCalculadora');
         this.btnCerrar = document.getElementById('btnCerrarCalculadora');
+        
+        // Elementos de resultados
+        this.resultadoUsd = document.getElementById('resultadoUsd');
+        this.resultadoEur = document.getElementById('resultadoEur');
+        this.resultadoBsUsd = document.getElementById('resultadoBsUsd');
+        this.resultadoBsEur = document.getElementById('resultadoBsEur');
+        this.resultadosConversion = document.getElementById('resultadosConversion');
         
         this.valorActual = '0';
         this.valorAnterior = '';
@@ -25,6 +31,7 @@ class CalculadoraDivisas {
         this.inicializarEventos();
         this.obtenerTasasCambio();
         this.inicializarVisibilidad();
+        this.actualizarResultados(); // Inicializar resultados
     }
     
     /**
@@ -81,6 +88,7 @@ class CalculadoraDivisas {
         document.querySelectorAll('.btn-numero').forEach(boton => {
             boton.addEventListener('click', () => {
                 this.agregarNumero(boton.getAttribute('data-value'));
+                this.actualizarResultados(); // Actualizar resultados automáticamente
             });
         });
         
@@ -101,11 +109,6 @@ class CalculadoraDivisas {
                 });
             }
         });
-        
-        // Evento para el selector de moneda
-        this.monedaOrigen.addEventListener('change', () => {
-            this.actualizarPantalla();
-        });
     }
     
     /**
@@ -123,6 +126,7 @@ class CalculadoraDivisas {
                             this.tasasCambio.USD = datos.usd.valor;
                             this.tasasCambio.EUR = datos.eur.valor;
                             console.log('💱 Tasas de cambio cargadas:', this.tasasCambio);
+                            this.actualizarResultados(); // Actualizar resultados con nuevas tasas
                         }
                     })
                     .catch(error => {
@@ -135,6 +139,77 @@ class CalculadoraDivisas {
         };
         
         verificarTasas();
+    }
+    
+    /**
+     * Actualiza todos los resultados de conversión automáticamente
+     */
+    actualizarResultados() {
+        // Convertir el valor de la pantalla a número
+        let valorTexto = this.valorActual.replace(/\./g, '').replace(',', '.');
+        const valor = parseFloat(valorTexto);
+        
+        if (isNaN(valor) || valor <= 0) {
+            this.limpiarResultados();
+            return;
+        }
+        
+        // Obtener tasas
+        const tasaUSD = this.tasasCambio.USD;
+        const tasaEUR = this.tasasCambio.EUR;
+        
+        if (tasaUSD === 0 || tasaEUR === 0) {
+            this.limpiarResultados();
+            return;
+        }
+        
+        // Conversión USD → Bs
+        const usdToBs = valor * tasaUSD;
+        this.resultadoUsd.textContent = this.formatearNumero(usdToBs) + ' Bs';
+        
+        // Conversión EUR → Bs
+        const eurToBs = valor * tasaEUR;
+        this.resultadoEur.textContent = this.formatearNumero(eurToBs) + ' Bs';
+        
+        // Conversión Bs → USD
+        const bsToUsd = valor / tasaUSD;
+        this.resultadoBsUsd.textContent = this.formatearNumero(bsToUsd) + ' USD';
+        
+        // Conversión Bs → EUR
+        const bsToEur = valor / tasaEUR;
+        this.resultadoBsEur.textContent = this.formatearNumero(bsToEur) + ' EUR';
+        
+        // Efecto visual de actualización
+        this.mostrarEfectoActualizacion();
+    }
+    
+    /**
+     * Limpia los resultados
+     */
+    limpiarResultados() {
+        this.resultadoUsd.textContent = '0,00 Bs';
+        this.resultadoEur.textContent = '0,00 Bs';
+        this.resultadoBsUsd.textContent = '0,00 USD';
+        this.resultadoBsEur.textContent = '0,00 EUR';
+    }
+    
+    /**
+     * Muestra efecto visual en los resultados
+     */
+    mostrarEfectoActualizacion() {
+        this.resultadosConversion.classList.add('resultado-actualizado');
+        setTimeout(() => {
+            this.resultadosConversion.classList.remove('resultado-actualizado');
+        }, 600);
+    }
+    
+    /**
+     * Formatea números con separadores de miles
+     */
+    formatearNumero(numero) {
+        if (isNaN(numero) || numero === 0) return '0,00';
+        
+        return numero.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
     
     /**
@@ -179,9 +254,7 @@ class CalculadoraDivisas {
             case 'calcular':
                 this.calcular();
                 break;
-            case 'convertir':
-                this.convertirDivisa();
-                break;
+            // Se eliminó el caso 'convertir-auto'
         }
     }
     
@@ -191,8 +264,8 @@ class CalculadoraDivisas {
     calcular() {
         if (this.operacion === null || this.esperandoNuevoValor) return;
         
-        const anterior = parseFloat(this.valorAnterior);
-        const actual = parseFloat(this.valorActual);
+        const anterior = parseFloat(this.valorAnterior.replace(/\./g, '').replace(',', '.'));
+        const actual = parseFloat(this.valorActual.replace(/\./g, '').replace(',', '.'));
         
         if (isNaN(anterior) || isNaN(actual)) return;
         
@@ -220,54 +293,7 @@ class CalculadoraDivisas {
         this.valorAnterior = '';
         this.esperandoNuevoValor = true;
         this.actualizarPantalla();
-    }
-    
-    /**
-     * Convierte entre divisas
-     */
-    convertirDivisa() {
-        const valor = parseFloat(this.valorActual);
-        if (isNaN(valor) || valor <= 0) return;
-        
-        const conversion = this.monedaOrigen.value;
-        let resultado;
-        let simbolo = '';
-        
-        this.calculadora.classList.add('calculadora-convertiendo');
-        
-        switch (conversion) {
-            case 'USD':
-                resultado = valor * this.tasasCambio.USD;
-                simbolo = 'Bs';
-                break;
-            case 'EUR':
-                resultado = valor * this.tasasCambio.EUR;
-                simbolo = 'Bs';
-                break;
-            case 'BS':
-                resultado = this.tasasCambio.USD > 0 ? valor / this.tasasCambio.USD : 0;
-                simbolo = 'USD';
-                break;
-            case 'BS-EUR':
-                resultado = this.tasasCambio.EUR > 0 ? valor / this.tasasCambio.EUR : 0;
-                simbolo = 'EUR';
-                break;
-        }
-        
-        if (resultado > 0) {
-            this.valorActual = resultado.toFixed(2);
-            this.actualizarPantalla();
-            
-            // Efecto visual de conversión exitosa
-            this.pantalla.classList.add('pantalla-resultado');
-            setTimeout(() => {
-                this.pantalla.classList.remove('pantalla-resultado');
-            }, 1000);
-        }
-        
-        setTimeout(() => {
-            this.calculadora.classList.remove('calculadora-convertiendo');
-        }, 500);
+        this.actualizarResultados();
     }
     
     /**
@@ -279,6 +305,7 @@ class CalculadoraDivisas {
         this.operacion = null;
         this.esperandoNuevoValor = false;
         this.actualizarPantalla();
+        this.limpiarResultados();
     }
     
     /**
@@ -291,6 +318,7 @@ class CalculadoraDivisas {
             this.valorActual = '0';
         }
         this.actualizarPantalla();
+        this.actualizarResultados();
     }
     
     /**
@@ -299,7 +327,9 @@ class CalculadoraDivisas {
     actualizarPantalla() {
         // Formatear número con separadores de miles
         const partes = this.valorActual.split('.');
-        partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        if (partes[0]) {
+            partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
         
         this.pantalla.value = partes.join(',');
     }

@@ -2,7 +2,7 @@
 // scraper_bcv.php
 /**
  * Widget Corporativo - API Tipos de Cambio BCV
- * @version 3.0
+ * @version 3.1
  * @license MIT
  */
 
@@ -19,13 +19,53 @@ include_once('simple_html_dom.php');
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Cache-Control: no-cache, no-store, must-revalidate');
-header('X-Widget-Version: 3.0');
+header('X-Widget-Version: 3.1');
 
 /**
  * Formatea números con 2 decimales
  */
 function formatearMoneda($numero) {
     return number_format($numero, 2, ',', '.');
+}
+
+/**
+ * Obtiene el nombre del día y mes en español
+ */
+function obtenerFechaEspanol() {
+    $zona_horaria = new DateTimeZone('America/Caracas');
+    $fecha = new DateTime('now', $zona_horaria);
+    
+    $dias = [
+        'Monday' => 'Lunes',
+        'Tuesday' => 'Martes',
+        'Wednesday' => 'Miércoles',
+        'Thursday' => 'Jueves',
+        'Friday' => 'Viernes',
+        'Saturday' => 'Sábado',
+        'Sunday' => 'Domingo'
+    ];
+    
+    $meses = [
+        'January' => 'Enero',
+        'February' => 'Febrero',
+        'March' => 'Marzo',
+        'April' => 'Abril',
+        'May' => 'Mayo',
+        'June' => 'Junio',
+        'July' => 'Julio',
+        'August' => 'Agosto',
+        'September' => 'Septiembre',
+        'October' => 'Octubre',
+        'November' => 'Noviembre',
+        'December' => 'Diciembre'
+    ];
+    
+    $dia_semana = $dias[$fecha->format('l')];
+    $dia = $fecha->format('d');
+    $mes = $meses[$fecha->format('F')];
+    $anio = $fecha->format('Y');
+    
+    return "$dia_semana, $dia $mes $anio";
 }
 
 /**
@@ -75,18 +115,19 @@ function obtenerTipoDeCambioBCV() {
 
     $resultado = [];
     
-    // Fecha en formato día/mes/año (Venezuela)
-    $zona_horaria = new DateTimeZone('America/Caracas');
-    $fecha = new DateTime('now', $zona_horaria);
-    $resultado['fecha'] = $fecha->format('d/m/Y');
+    // Fecha en formato completo español
+    $resultado['fecha'] = obtenerFechaEspanol();
+    $resultado['fecha_corta'] = date('d/m/Y');
 
     // Procesar USD
     if ($dolar) {
         $valor = trim($dolar->plaintext);
         $valor_limpio = str_replace(',', '.', $valor);
+        // Agregar redondeo a 2 decimales
+        $valor_redondeado = round((float)$valor_limpio, 2);
         $resultado['usd'] = [
-            'valor' => (float)$valor_limpio,
-            'formateado' => formatearMoneda((float)$valor_limpio)
+            'valor' => $valor_redondeado,
+            'formateado' => formatearMoneda($valor_redondeado)
         ];
     }
 
@@ -94,9 +135,11 @@ function obtenerTipoDeCambioBCV() {
     if ($euro) {
         $valor = trim($euro->plaintext);
         $valor_limpio = str_replace(',', '.', $valor);
+        // Agregar redondeo a 2 decimales
+        $valor_redondeado = round((float)$valor_limpio, 2);
         $resultado['eur'] = [
-            'valor' => (float)$valor_limpio,
-            'formateado' => formatearMoneda((float)$valor_limpio)
+            'valor' => $valor_redondeado,
+            'formateado' => formatearMoneda($valor_redondeado)
         ];
     }
 
