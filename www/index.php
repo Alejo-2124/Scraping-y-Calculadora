@@ -12,7 +12,7 @@
         <!-- Widget de Tipos de Cambio -->
         <div class="widget-bcv" id="widgetBCV">
             <div class="widget-header">
-                <h1>Tiposss de Cambio</h1>
+                <h1>Tiposs de Cambio</h1>
                 <p>Banco Central de Venezuela</p>
             </div>
             
