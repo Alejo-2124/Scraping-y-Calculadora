@@ -1,9 +1,9 @@
 services:
   web:
     build: .
-    container_name: php_web
+    container_name: php_web_scraping
     ports:
-      - "8080:80"
+      - "18084:80"
     volumes:
       - ./www:/var/www/html/
     depends_on:
@@ -11,7 +11,7 @@ services:
 
   db:
     image: mysql:5.7
-    container_name: mysql_db
+    container_name: mysql_db_scraping
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -25,11 +25,11 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
+    container_name: phpmyadmin_scraping
     environment:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - "8081:80"
+      - "18001:81"
     depends_on:
       - db
