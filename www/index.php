@@ -9,10 +9,10 @@
 </head>
 <body>
     <div class="contenedor-principal">
-        <!-- Widget de Tipos de Cambio -->
+        <!-- Widget de Tipo de Cambio -->
         <div class="widget-bcv" id="widgetBCV">
             <div class="widget-header">
-                <h1>Tipos de Cambios</h1>
+                <h1>Tipo de Cambio</h1>
                 <p>Banco Central de Venezuela</p>
             </div>
             

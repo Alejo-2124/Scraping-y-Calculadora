@@ -2,7 +2,7 @@
 // scraper_bcv.php
 /**
  * Widget Corporativo - API Tipos de Cambio BCV
- * @version 3.1
+ * @version 3.4
  * @license MIT
  */
 
@@ -19,7 +19,7 @@ include_once('simple_html_dom.php');
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Cache-Control: no-cache, no-store, must-revalidate');
-header('X-Widget-Version: 3.1');
+header('X-Widget-Version: 3.4');
 
 /**
  * Formatea números con 2 decimales
@@ -29,43 +29,69 @@ function formatearMoneda($numero) {
 }
 
 /**
- * Obtiene el nombre del día y mes en español
+ * Obtiene la fecha ajustada según las reglas del BCV
+ * Los viernes muestran la tasa del siguiente lunes (fecha valor)
  */
-function obtenerFechaEspanol() {
+function obtenerFechaAjustada() {
     $zona_horaria = new DateTimeZone('America/Caracas');
     $fecha = new DateTime('now', $zona_horaria);
     
+    $dia_semana = $fecha->format('N'); // 1 (lunes) a 7 (domingo)
+    $hora_actual = $fecha->format('H:i');
+    
+    // Si es viernes (5) después del mediodía, mostramos la fecha del lunes
+    if ($dia_semana == 5 && $hora_actual >= '12:00') {
+        $fecha->modify('next monday');
+    }
+    // Si es sábado (6) o domingo (7), mostramos la fecha del lunes
+    elseif ($dia_semana >= 6) {
+        $fecha->modify('next monday');
+    }
+    
+    return $fecha;
+}
+
+/**
+ * Obtiene el nombre del día y mes en español con formato BCV
+ * Formato: "Fecha valor: jueves, 20 de noviembre de 2025"
+ */
+function obtenerFechaEspanolBCV($fecha = null) {
+    if ($fecha === null) {
+        $fecha = obtenerFechaAjustada();
+    }
+    
     $dias = [
-        'Monday' => 'Lunes',
-        'Tuesday' => 'Martes',
-        'Wednesday' => 'Miércoles',
-        'Thursday' => 'Jueves',
-        'Friday' => 'Viernes',
-        'Saturday' => 'Sábado',
-        'Sunday' => 'Domingo'
+        1 => 'lunes',
+        2 => 'martes', 
+        3 => 'miércoles',
+        4 => 'jueves',
+        5 => 'viernes',
+        6 => 'sábado',
+        7 => 'domingo'
     ];
     
     $meses = [
-        'January' => 'Enero',
-        'February' => 'Febrero',
-        'March' => 'Marzo',
-        'April' => 'Abril',
-        'May' => 'Mayo',
-        'June' => 'Junio',
-        'July' => 'Julio',
-        'August' => 'Agosto',
-        'September' => 'Septiembre',
-        'October' => 'Octubre',
-        'November' => 'Noviembre',
-        'December' => 'Diciembre'
+        1 => 'enero',
+        2 => 'febrero',
+        3 => 'marzo',
+        4 => 'abril',
+        5 => 'mayo',
+        6 => 'junio',
+        7 => 'julio',
+        8 => 'agosto',
+        9 => 'septiembre',
+        10 => 'octubre',
+        11 => 'noviembre',
+        12 => 'diciembre'
     ];
     
-    $dia_semana = $dias[$fecha->format('l')];
+    $dia_semana = $dias[$fecha->format('N')];
     $dia = $fecha->format('d');
-    $mes = $meses[$fecha->format('F')];
+    $mes = $meses[$fecha->format('n')];
     $anio = $fecha->format('Y');
     
-    return "$dia_semana, $dia $mes $anio";
+    // Formato BCV: "Fecha valor: jueves, 20 de noviembre de 2025"
+    return 'Fecha valor: ' . $dia_semana . ', ' . $dia . ' de ' . $mes . ' de ' . $anio;
 }
 
 /**
@@ -115,9 +141,22 @@ function obtenerTipoDeCambioBCV() {
 
     $resultado = [];
     
-    // Fecha en formato completo español
-    $resultado['fecha'] = obtenerFechaEspanol();
-    $resultado['fecha_corta'] = date('d/m/Y');
+    // Obtener fecha ajustada según reglas BCV
+    $fechaAjustada = obtenerFechaAjustada();
+    
+    // Fecha 
+    $resultado['fecha'] = obtenerFechaEspanolBCV($fechaAjustada);
+    $resultado['fecha_corta'] = $fechaAjustada->format('d/m/Y');
+    $resultado['fecha_valor'] = $fechaAjustada->format('Y-m-d');
+    
+    // Información sobre el ajuste de fecha
+    $hoy = new DateTime('now', new DateTimeZone('America/Caracas'));
+    if ($hoy->format('Y-m-d') !== $fechaAjustada->format('Y-m-d')) {
+        $resultado['fecha_ajustada'] = true;
+        $resultado['fecha_original'] = $hoy->format('Y-m-d');
+    } else {
+        $resultado['fecha_ajustada'] = false;
+    }
 
     // Procesar USD
     if ($dolar) {
