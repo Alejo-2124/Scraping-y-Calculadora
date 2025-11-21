@@ -86,7 +86,7 @@
                     </div>
                 </div>
                 
-                <!-- Botones de la calculadora (SIN BOTÓN DE CONVERSIÓN) -->
+                <!-- Botones de la calculadora -->
                 <div class="botones-calculadora">
                     <button class="btn-calc btn-limpiar" data-action="limpiar">C</button>
                     <button class="btn-calc btn-operador" data-action="borrar">⌫</button>
